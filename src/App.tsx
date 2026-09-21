@@ -321,13 +321,13 @@ export default function App() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a 
-            href="mailto:alex@rivera.design" 
+            href="mailto:joel220013@gmail.com" 
             className="px-8 py-3.5 rounded-xl bg-emerald-500 text-black font-bold text-sm hover:bg-emerald-400 transition-colors flex items-center gap-2"
           >
             <Mail className="w-4 h-4" /> Start a Conversation
           </a>
           <a 
-            href="https://github.com" 
+            href="https://github.com/joel220013-sys" 
             target="_blank" 
             rel="noreferrer" 
             className="px-8 py-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 font-bold text-sm hover:bg-zinc-800 transition-colors flex items-center gap-2"
