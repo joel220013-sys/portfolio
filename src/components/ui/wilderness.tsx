@@ -1,447 +1,135 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from '@studio-freight/lenis';
 import { cn } from '@/lib/utils';
-import { ChevronDown, Compass } from 'lucide-react';
+import { 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Plus, 
+  Search, 
+  SlidersHorizontal,
+  ChevronDown
+} from 'lucide-react';
 
 export interface ParallaxLayer {
   src: string;
   alt: string;
-  speedX: number;
-  speedY: number;
-  speedZ: number;
-  rotation: number;
-  distance: number;
+  speedX?: number;
+  speedY?: number;
+  speedZ?: number;
+  rotation?: number;
+  distance?: number;
   className?: string;
-  zIndex: number;
-  initialTop: string;
-  initialLeft: string;
-  width: string;
+  zIndex?: number;
 }
 
-export interface ParallaxHeroProps {
-  layers?: ParallaxLayer[];
+export const defaultLayers: ParallaxLayer[] = [];
+
+export interface CyberSecurityHeroProps {
   title?: string;
   subtitle?: string;
+  layers?: ParallaxLayer[];
   className?: string;
 }
 
-// Fallback Unsplash assets in case CDN mirrors are blocked or fail
-const UNSPLASH_FALLBACKS: Record<string, string> = {
-  background: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=3200&q=80',
-  mountain: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80',
-  fog: 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=2200&q=80',
-  forest: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=2000&q=80',
-};
-
-export const defaultLayers: ParallaxLayer[] = [
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/bf/bfb8ca258f591d2b7388d05d79ac2332b695867281627c1bc8c7165ca6429a6d.png',
-    alt: 'background',
-    speedX: 0.03,
-    speedY: 0.038,
-    speedZ: 0,
-    rotation: 0,
-    distance: -200,
-    zIndex: 1,
-    initialTop: 'calc(50% - 50px)',
-    initialLeft: 'calc(50% + 0px)',
-    width: '3200px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/c8/c878e14d1f8e481f6f70b31fb01de352338db5353f5b8852a241062bb251b558.png',
-    alt: 'fog-7',
-    speedX: 0.27,
-    speedY: 0.32,
-    speedZ: 0,
-    rotation: 0,
-    distance: 850,
-    zIndex: 2,
-    initialTop: 'calc(50% - 100px)',
-    initialLeft: 'calc(50% + 300px)',
-    width: '1900px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/e9/e94a2247aa54feee12cd1580a7c3abf97d6f55bbe7e50006d8dda6e4dffbe921.png',
-    alt: 'mountain-10',
-    speedX: 0.095,
-    speedY: 0.005,
-    speedZ: 0,
-    rotation: 0,
-    distance: 1110,
-    zIndex: 3,
-    initialTop: 'calc(50% + 169px)',
-    initialLeft: 'calc(50% + 330px)',
-    width: '1200px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/99/9955626de3f10d97d27b7b89f7be180c02e1700f288db28e0c6824142871523f.png',
-    alt: 'fog-6',
-    speedX: 0.25,
-    speedY: 0.28,
-    speedZ: 0,
-    rotation: 0,
-    distance: 1400,
-    zIndex: 4,
-    initialTop: 'calc(50% + 285px)',
-    initialLeft: 'calc(50%)',
-    width: '2200px',
-    className: 'opacity-30',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/dd/dd999609be149c46fcb65fce4d267cad8d5651b0c31901b399054da5146cb46e.png',
-    alt: 'mountain-9',
-    speedX: 0.125,
-    speedY: 0.155,
-    speedZ: 0.15,
-    rotation: 0.02,
-    distance: 1700,
-    zIndex: 51,
-    initialTop: 'calc(50% + 313px)',
-    initialLeft: 'calc(50% - 557px)',
-    width: '670px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/d5/d579e64ddeb3a32d04dff5391980b827eb4d6d4aafa2cc3231e2cbe02d66a7c7.png',
-    alt: 'fog-5',
-    speedX: 0.16,
-    speedY: 0.105,
-    speedZ: 0,
-    rotation: 0,
-    distance: 1900,
-    zIndex: 7,
-    initialTop: 'calc(50% + 360px)',
-    initialLeft: 'calc(50% + 40px)',
-    width: '650px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/b7/b74be54427fd5b9568571ba97684bc8a4334d366a3f3b32c353d31fd1501c09b.png',
-    alt: 'mountain-7',
-    speedX: 0.1,
-    speedY: 0.1,
-    speedZ: 0,
-    rotation: 0.09,
-    distance: 2000,
-    zIndex: 19,
-    initialTop: 'calc(50% + 223px)',
-    initialLeft: 'calc(50% + 495px)',
-    width: '738px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/ed/edf306a4225b6188283aa94ecec1553b2e0855038a3acaed402001f38c64af1d.png',
-    alt: 'mountain-6',
-    speedX: 0.065,
-    speedY: 0.05,
-    speedZ: 0.05,
-    rotation: 0.12,
-    distance: 2300,
-    zIndex: 18,
-    initialTop: 'calc(50% + 120px)',
-    initialLeft: 'calc(50% + 590px)',
-    width: '408px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/8d/8d12582b7eac71f981eca3a8bb19157fb57fc4b05c14f9ef80fd029e5fecfab5.png',
-    alt: 'fog-4',
-    speedX: 0.135,
-    speedY: 0.1,
-    speedZ: 0,
-    rotation: 0,
-    distance: 2400,
-    zIndex: 11,
-    initialTop: 'calc(50% + 223px)',
-    initialLeft: 'calc(50% + 460px)',
-    width: '590px',
-    className: 'opacity-50',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/9c/9c1a1b7f4b165011788c27d440d920e407d70f148cbc9a01eacfecb49126efcb.png',
-    alt: 'mountain-5',
-    speedX: 0.08,
-    speedY: 0.05,
-    speedZ: 0.13,
-    rotation: 0.1,
-    distance: 2550,
-    zIndex: 12,
-    initialTop: 'calc(50% + 320px)',
-    initialLeft: 'calc(50% + 230px)',
-    width: '725px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/0e/0e7888cc6d1732222b5c1f38b925cf1ecdb7fec02fd1193dd1cfef280a453c5a.png',
-    alt: 'fog-3',
-    speedX: 0.11,
-    speedY: 0.018,
-    speedZ: 0,
-    rotation: 0,
-    distance: 2800,
-    zIndex: 113,
-    initialTop: 'calc(50% + 210px)',
-    initialLeft: 'calc(50% + 5px)',
-    width: '1600px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/fa/fa0946f924ad025b207616cfe20ce022bcccd22ac9db4038a584ace23b7d9721.png',
-    alt: 'mountain-4',
-    speedX: 0.059,
-    speedY: 0.024,
-    speedZ: 0.35,
-    rotation: 0.14,
-    distance: 3200,
-    zIndex: 15,
-    initialTop: 'calc(50% + 196px)',
-    initialLeft: 'calc(50% - 698px)',
-    width: '1100px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/90/90863919566208c1eb7a78136d1dd493dd402f4d5a5efe2fc890a288a6b07449.png',
-    alt: 'mountain-3',
-    speedX: 0.04,
-    speedY: 0.018,
-    speedZ: 0.32,
-    rotation: 0.05,
-    distance: 3400,
-    zIndex: 20,
-    initialTop: 'calc(50% - 20px)',
-    initialLeft: 'calc(50% + 750px)',
-    width: '630px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/b2/b2d0ba5c7f17d038a04475b8f36563aea22cfee00983db3b5477f1ac4c9a5097.png',
-    alt: 'fog-2',
-    speedX: 0.15,
-    speedY: 0.0115,
-    speedZ: 0,
-    rotation: 0,
-    distance: 3600,
-    zIndex: 16,
-    initialTop: 'calc(50% - 20px)',
-    initialLeft: 'calc(50% + 698px)',
-    width: '1100px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/c4/c4ae700b3a0070eae9f3c005a17572ae68fcb8373d322f279d28c5bf19cd501d.png',
-    alt: 'mountain-2',
-    speedX: 0.0235,
-    speedY: 0.013,
-    speedZ: 0.42,
-    rotation: 0.15,
-    distance: 3800,
-    zIndex: 17,
-    initialTop: 'calc(50% + 256px)',
-    initialLeft: 'calc(50% + 528px)',
-    width: '800px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/41/414097ad4507410ac1dc884afcc92bb3f4f45763fd17b2986bf82dd43c31da97.png',
-    alt: 'mountain-1',
-    speedX: 0.027,
-    speedY: 0.018,
-    speedZ: 0.53,
-    rotation: 0.2,
-    distance: 4000,
-    zIndex: 18,
-    initialTop: 'calc(50% + 196px)',
-    initialLeft: 'calc(50% - 728px)',
-    width: '1100px',
-  },
-  {
-    src: 'https://cdn.21st.dev/assets/mirror/aa/aa8ace86d9779fcccce3a1a28b8ac0cb86336b5980706659f2c8889c3daaf5a1.png',
-    alt: 'fog-1',
-    speedX: 0.12,
-    speedY: 0.01,
-    speedZ: 0,
-    rotation: 0,
-    distance: 4200,
-    zIndex: 21,
-    initialTop: 'calc(100% - 355px)',
-    initialLeft: 'calc(50% + 100px)',
-    width: '1900px',
-    className: 'opacity-50',
-  },
-];
-
-export const ParallaxHero: React.FC<ParallaxHeroProps> = ({
-  layers = defaultLayers,
-  title = 'HERO',
-  subtitle: _subtitle,
+export const ParallaxHero: React.FC<CyberSecurityHeroProps> = ({
   className,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const layerRefs = useRef<(HTMLImageElement | null)[]>([]);
-  const textRef = useRef<HTMLDivElement>(null);
-  const [_xValue, setXValue] = useState(0);
-  const [_yValue, setYValue] = useState(0);
-  const [_rotateDegree, setRotateDegree] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const characterRef = useRef<HTMLDivElement>(null);
+  const textLayerRef = useRef<HTMLDivElement>(null);
+  const hudLinesRef = useRef<HTMLDivElement>(null);
+  const serviceCardRef = useRef<HTMLDivElement>(null);
+  const leftCardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkViewport = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsTouchDevice(
-        'ontouchstart' in window || navigator.maxTouchPoints > 0
-      );
-    };
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-    return () => window.removeEventListener('resize', checkViewport);
-  }, []);
-
-  const updateLayers = useCallback((
-    cursorPosition: number,
-    xVal: number,
-    yVal: number,
-    rotateDeg: number,
-    scrollProg: number = 0
-  ) => {
-    layerRefs.current.forEach((el, index) => {
-      if (!el) return;
-
-      const layer = layers[index];
-      if (!layer) return;
-      const { speedX, speedY, speedZ, rotation } = layer;
-
-      const computedLeft = parseFloat(
-        getComputedStyle(el).left.replace('px', '')
-      );
-      const isInLeft = computedLeft < window.innerWidth / 2 ? 1 : -1;
-      const zValue = (cursorPosition - computedLeft) * isInLeft * 0.1;
-
-      // Calculate multi-layer scrolling offset proportional to layer speed and depth distance
-      const scrollOffset = scrollProg * (layer.speedY * 1100 + (layer.distance > 0 ? layer.distance * 0.15 : 0));
-
-      el.style.transform = `perspective(2300px) translateZ(${
-        zValue * speedZ
-      }px) rotateY(${rotateDeg * rotation}deg) translateX(calc(-50% + ${
-        -xVal * speedX
-      }px)) translateY(calc(-50% + ${yVal * speedY + scrollOffset}px))`;
-    });
-
-    if (textRef.current) {
-      const textSpeedX = 0.07;
-      const textSpeedY = 0.05;
-      const textSpeedZ = 0.08;
-      const textRotation = 0.04;
-
-      const computedLeft = parseFloat(
-        getComputedStyle(textRef.current).left.replace('px', '')
-      );
-      const isInLeft = computedLeft < window.innerWidth / 2 ? 1 : -1;
-      const zValue = (cursorPosition - computedLeft) * isInLeft * 0.1;
-
-      const textScrollOffset = scrollProg * 260;
-
-      textRef.current.style.transform = `perspective(2300px) translateZ(${
-        zValue * textSpeedZ
-      }px) rotateY(${rotateDeg * textRotation}deg) translateX(calc(-50% + ${
-        -xVal * textSpeedX
-      }px)) translateY(calc(-50% + ${yVal * textSpeedY + textScrollOffset}px))`;
-      textRef.current.style.opacity = `${Math.max(0, 1 - scrollProg * 1.5)}`;
-    }
-  }, [layers]);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [velocityShake, setVelocityShake] = useState(0);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    let scrollProgress = 0;
-    let lastCursor = {
-      clientX: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
-      xVal: 0,
-      yVal: 0,
-      rotateDeg: 0,
-    };
-
-    const trigger = ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: 0,
-      onUpdate: (self) => {
-        scrollProgress = self.progress;
-        updateLayers(
-          lastCursor.clientX,
-          lastCursor.xVal,
-          lastCursor.yVal,
-          lastCursor.rotateDeg,
-          scrollProgress
-        );
-      },
-    });
+    let shakeDecay: number | null = null;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let currentShake = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newXValue = e.clientX - window.innerWidth / 2;
-      const newYValue = e.clientY - window.innerHeight / 2;
-      const newRotateDegree = (newXValue / (window.innerWidth / 2)) * 20;
+      // Normalized coordinates (-1 to 1) from screen center
+      const normX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+      const normY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      const velocity = Math.min(2.5, Math.hypot(e.movementX, e.movementY) / 20);
 
-      lastCursor = {
-        clientX: e.clientX,
-        xVal: newXValue,
-        yVal: newYValue,
-        rotateDeg: newRotateDegree,
-      };
+      targetX = normX;
+      targetY = normY;
+      currentShake = velocity;
+      setVelocityShake(velocity);
 
-      setXValue(newXValue);
-      setYValue(newYValue);
-      setRotateDegree(newRotateDegree);
+      setCursorPos({ x: Math.round(e.clientX), y: Math.round(e.clientY) });
 
-      updateLayers(e.clientX, newXValue, newYValue, newRotateDegree, scrollProgress);
+      if (shakeDecay) window.clearTimeout(shakeDecay);
+      shakeDecay = window.setTimeout(() => {
+        currentShake = 0;
+        setVelocityShake(0);
+      }, 150);
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!e.touches || e.touches.length === 0) return;
-      const touch = e.touches[0];
-      const newXValue = touch.clientX - window.innerWidth / 2;
-      const newYValue = touch.clientY - window.innerHeight / 2;
-      const newRotateDegree = (newXValue / (window.innerWidth / 2)) * 15;
+    let animId: number;
+    const render = () => {
+      // Smooth lerp
+      currentX += (targetX - currentX) * 0.07;
+      currentY += (targetY - currentY) * 0.07;
 
-      lastCursor = {
-        clientX: touch.clientX,
-        xVal: newXValue,
-        yVal: newYValue,
-        rotateDeg: newRotateDegree,
-      };
+      const jitterX = (Math.random() - 0.5) * currentShake * 3;
+      const jitterY = (Math.random() - 0.5) * currentShake * 3;
 
-      setXValue(newXValue);
-      setYValue(newYValue);
-      setRotateDegree(newRotateDegree);
+      // 1. Central 3D Cyber Character subtle head-tracking & parallax
+      if (characterRef.current) {
+        const rotY = currentX * 12;
+        const rotX = -currentY * 10;
+        const transX = currentX * -14 + jitterX;
+        const transY = currentY * -10 + jitterY;
+        characterRef.current.style.transform = `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateX(${transX}px) translateY(${transY}px) scale(1.02)`;
+      }
 
-      updateLayers(touch.clientX, newXValue, newYValue, newRotateDegree, scrollProgress);
+      // 2. Center Text Parallax
+      if (textLayerRef.current) {
+        const tX = currentX * -22 + jitterX * 1.5;
+        const tY = currentY * -16 + jitterY * 1.5;
+        textLayerRef.current.style.transform = `translateX(${tX}px) translateY(${tY}px)`;
+      }
+
+      // 3. Right Circular "Our service" Card 3D Floating Tilt
+      if (serviceCardRef.current) {
+        const rotY = currentX * 24;
+        const rotX = -currentY * 20;
+        const transZ = 40 + currentShake * 25;
+        serviceCardRef.current.style.transform = `perspective(1000px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateZ(${transZ}px) translateX(${currentX * -28 + jitterX * 2}px) translateY(${currentY * -22 + jitterY * 2}px)`;
+      }
+
+      // 4. Left Thumbnail Card 3D Tilt
+      if (leftCardRef.current) {
+        const rotY = currentX * 18;
+        const rotX = -currentY * 15;
+        leftCardRef.current.style.transform = `perspective(1000px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateX(${currentX * -16 + jitterX}px) translateY(${currentY * -12 + jitterY}px)`;
+      }
+
+      // 5. Precision HUD Gridlines micro-drift
+      if (hudLinesRef.current) {
+        hudLinesRef.current.style.transform = `translateX(${currentX * -4}px) translateY(${currentY * -4}px)`;
+      }
+
+      animId = requestAnimationFrame(render);
     };
 
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (e.gamma === null || e.beta === null) return;
-      const clampedGamma = Math.max(-40, Math.min(40, e.gamma));
-      const clampedBeta = Math.max(-40, Math.min(40, e.beta - 45));
-
-      const newXValue = (clampedGamma / 40) * (window.innerWidth * 0.2);
-      const newYValue = (clampedBeta / 40) * (window.innerHeight * 0.2);
-      const newRotateDegree = (clampedGamma / 40) * 12;
-
-      lastCursor = {
-        clientX: window.innerWidth / 2 + newXValue,
-        xVal: newXValue,
-        yVal: newYValue,
-        rotateDeg: newRotateDegree,
-      };
-
-      setXValue(newXValue);
-      setYValue(newYValue);
-      setRotateDegree(newRotateDegree);
-
-      updateLayers(lastCursor.clientX, newXValue, newYValue, newRotateDegree, scrollProgress);
-    };
-
+    animId = requestAnimationFrame(render);
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
-    if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-      window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-    }
-
+    // Lenis Smooth Scroll
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -449,185 +137,220 @@ export const ParallaxHero: React.FC<ParallaxHeroProps> = ({
     });
 
     lenis.on('scroll', ScrollTrigger.update);
-    const tickerCallback = (time: number) => {
+    const tickerCb = (time: number) => {
       lenis.raf(time * 1000);
     };
-
-    gsap.ticker.add(tickerCallback);
+    gsap.ticker.add(tickerCb);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
-      if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-        window.removeEventListener('deviceorientation', handleOrientation);
-      }
-      trigger.kill();
-      gsap.ticker.remove(tickerCallback);
+      if (shakeDecay) window.clearTimeout(shakeDecay);
+      cancelAnimationFrame(animId);
+      gsap.ticker.remove(tickerCb);
       lenis.destroy();
     };
-  }, [layers, updateLayers]);
-
-  const getResponsiveStyle = (layer: ParallaxLayer, index: number): React.CSSProperties => {
-    if (index === 0) {
-      return {
-        top: '50%',
-        left: '50%',
-        width: isMobile ? '135vw' : '120vw',
-        minWidth: isMobile ? '850px' : '1500px',
-        height: '120vh',
-        minHeight: '100dvh',
-        zIndex: layer.zIndex,
-        transform: 'translate(-50%, -50%)',
-        objectFit: 'cover',
-        objectPosition: 'center',
-      };
-    }
-
-    if (isMobile) {
-      const widthNum = parseFloat(layer.width);
-      const mobileWidth = Math.round(widthNum * 0.55);
-
-      let mobileLeft = layer.initialLeft;
-      const leftMatch = layer.initialLeft.match(/calc\(50%\s*([+-])\s*(\d+)px\)/);
-      if (leftMatch) {
-        const sign = leftMatch[1];
-        const val = parseFloat(leftMatch[2]);
-        const scaledVal = Math.round(val * 0.4);
-        mobileLeft = `calc(50% ${sign} ${scaledVal}px)`;
-      }
-
-      let mobileTop = layer.initialTop;
-      const topMatch = layer.initialTop.match(/calc\((50%|100%)\s*([+-])\s*(\d+)px\)/);
-      if (topMatch) {
-        const base = topMatch[1];
-        const sign = topMatch[2];
-        const val = parseFloat(topMatch[3]);
-        const scaledVal = Math.round(val * 0.7);
-        mobileTop = `calc(${base} ${sign} ${scaledVal}px)`;
-      }
-
-      return {
-        width: `${mobileWidth}px`,
-        top: mobileTop,
-        left: mobileLeft,
-        zIndex: layer.zIndex,
-        transform: 'translate(-50%, -50%)',
-      };
-    }
-
-    return {
-      width: layer.width,
-      top: layer.initialTop,
-      left: layer.initialLeft,
-      zIndex: layer.zIndex,
-      transform: 'translate(-50%, -50%)',
-    };
-  };
+  }, []);
 
   return (
-    <main
-      ref={containerRef}
+    <section
+      ref={heroRef}
       className={cn(
-        'relative h-[100dvh] min-h-[620px] w-full overflow-hidden bg-gradient-to-b from-[#060e18] via-[#0b1626] to-[#09090b]',
+        'relative h-[100dvh] min-h-[700px] w-full overflow-hidden bg-[#111318] text-white select-none selection:bg-[#44f575] selection:text-black flex flex-col justify-between',
         className
       )}
     >
-      {/* Top Atmosphere Gradient for Seamless Header Blending */}
-      <div className="absolute top-0 left-0 right-0 h-32 sm:h-40 bg-gradient-to-b from-[#09090b]/90 via-[#09090b]/35 to-transparent z-[25] pointer-events-none" />
-
-      {/* Vignette Depth Gradient */}
-      <div className="absolute inset-0 z-[26] pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_35%,rgba(9,9,11,0.85)_100%)]" />
-
-      {/* Subtle Star / Particle Field */}
-      <div className="absolute inset-0 z-[0] bg-[radial-gradient(#38bdf8_0.75px,transparent_0.75px)] [background-size:32px_32px] opacity-15 pointer-events-none" />
-
-      {/* Render Parallax Layers */}
-      {layers.map((layer, index) => (
-        <img
-          key={index}
-          ref={(el) => {
-            if (el) layerRefs.current[index] = el;
-          }}
-          src={layer.src}
-          alt={layer.alt}
-          onError={(e) => {
-            const target = e.currentTarget;
-            if (layer.alt.includes('fog')) {
-              target.src = UNSPLASH_FALLBACKS.fog;
-              target.style.mixBlendMode = 'screen';
-              target.style.opacity = '0.35';
-            } else if (layer.alt.includes('mountain')) {
-              target.src = UNSPLASH_FALLBACKS.mountain;
-              target.style.mixBlendMode = 'lighten';
-            } else {
-              target.src = UNSPLASH_FALLBACKS.background;
-            }
-          }}
-          className={cn(
-            'absolute pointer-events-none transition-transform duration-[450ms] ease-out will-change-transform select-none max-w-none',
-            index === 0 && 'object-cover object-center',
-            layer.className
-          )}
-          style={getResponsiveStyle(layer, index)}
-        />
-      ))}
-
-      {/* Central Interactive Headline */}
-      <div
-        ref={textRef}
-        className="absolute z-[9] text-white text-center pointer-events-none transition-transform duration-[450ms] ease-out will-change-transform px-4 w-full max-w-4xl"
-        style={{
-          top: isMobile ? '50%' : 'calc(50% - 25px)',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
+      {/* 1. Central 3D Cyberpunk Character Layer (Pink hair, Tinted Glasses, Cyber Jaw) */}
+      <div 
+        ref={characterRef}
+        className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-transform duration-200 ease-out will-change-transform"
       >
-        <h1 className="font-black text-[2.6rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6.5rem] leading-[0.88] sm:leading-[0.95] tracking-tighter uppercase drop-shadow-[0_20px_45px_rgba(0,0,0,0.9)] select-none text-center">
-          {(() => {
-            if (!title.includes(' ')) return title;
-            const words = title.trim().split(/\s+/);
-            if (words.length === 3 && words[2].length <= 2) {
-              return (
-                <>
-                  <span className="block sm:inline sm:mr-4 md:mr-5">{words[0]}</span>
-                  <span className="block sm:inline whitespace-nowrap">
-                    {words[1]} {words[2]}
-                  </span>
-                </>
-              );
-            }
-            return words.map((word, wIdx) => (
-              <span key={wIdx} className="block sm:inline sm:mr-4 md:mr-5 last:mr-0">
-                {word}
-              </span>
-            ));
-          })()}
-        </h1>
+        <img
+          src="/cyber-hero-joel.jpg"
+          alt="Joel Joyson N - Cyberpunk Hero"
+          className="w-full h-full object-cover object-[center_20%] brightness-[0.95] contrast-[108%]"
+        />
+        {/* Soft Vignette Gradients for Editorial Atmosphere */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#111318] via-transparent to-[#111318]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#111318]/70 via-transparent to-[#111318]/70" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(17,19,24,0.6)_100%)]" />
       </div>
 
-      {/* Atmospheric Bottom Horizon Blend */}
-      <div className="absolute bottom-0 left-0 right-0 h-44 sm:h-52 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent z-[27] pointer-events-none" />
+      {/* 2. Precision Minimalist HUD Crosshair Gridlines (Matching Reference Image Exactly) */}
+      <div 
+        ref={hudLinesRef}
+        className="absolute inset-0 z-10 pointer-events-none will-change-transform"
+      >
+        {/* Center Vertical Axis Hairline */}
+        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1px] bg-white/20" />
 
-      {/* Interactive Explorer Scroll Cue */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[35] flex flex-col items-center gap-2 pointer-events-auto">
-        <a
-          href="#about"
-          className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full border border-zinc-700/60 bg-zinc-900/70 backdrop-blur-md text-xs font-mono text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all duration-300 group shadow-lg"
-        >
-          <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 group-hover:rotate-45 transition-transform duration-500" />
-          <span className="tracking-wider uppercase text-[10px] sm:text-[11px]">
-            {isMobile || isTouchDevice ? 'Scroll to Explore' : 'Move Cursor / Scroll Down'}
+        {/* Horizontal Eye/Glasses Alignment Line */}
+        <div className="absolute left-0 right-0 top-[26%] h-[1px] bg-white/15" />
+
+        {/* Horizontal Mid Jaw/Subtitle Line */}
+        <div className="absolute left-0 right-0 top-[52%] h-[1px] bg-white/20" />
+
+        {/* Horizontal Title Baseline Line */}
+        <div className="absolute left-0 right-0 top-[78%] h-[1px] bg-white/15" />
+
+        {/* Large Concentric Orbital Ring Arc (Right Side) */}
+        <div className="absolute top-[-10%] right-[-5%] w-[820px] h-[820px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute top-[8%] right-[8%] w-[580px] h-[580px] rounded-full border border-white/10 pointer-events-none" />
+
+        {/* Left Sub-Grid Segment */}
+        <div className="absolute top-[52%] left-10 sm:left-16 w-32 sm:w-48 h-[1px] bg-white/30" />
+      </div>
+
+      {/* 3. Top Navigation Bar (Matching Reference Image: Home, Explore, Service, Catalog) */}
+      <nav className="relative z-30 w-full px-6 sm:px-12 pt-8 flex items-center justify-between text-xs font-mono">
+        {/* Left Nav Links */}
+        <div className="flex items-center gap-8 text-zinc-300">
+          <a href="#home" className="relative text-white font-bold pb-1 group flex flex-col items-center">
+            <span>Home</span>
+            <span className="w-full h-[2px] bg-white mt-0.5 rounded-full" />
+          </a>
+          <a href="#about" className="hover:text-white transition-colors">Explore</a>
+          <a href="#projects" className="hover:text-white transition-colors">Service</a>
+        </div>
+
+        {/* Top Right Actions */}
+        <div className="flex items-center gap-4">
+          <a
+            href="#projects"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-black/30 backdrop-blur-md text-zinc-300 hover:text-white hover:border-white/40 transition-all group"
+          >
+            <span className="text-[11px] tracking-wide">Catalog</span>
+            <div className="w-3.5 h-3.5 rounded-full border border-zinc-400 group-hover:border-white flex items-center justify-center">
+              <span className="w-1 h-1 rounded-full bg-white" />
+            </div>
+          </a>
+        </div>
+      </nav>
+
+      {/* 4. Left Side HUD Badges (Gaming / Protecting Future, Battery — 50%) */}
+      <div className="absolute top-24 left-6 sm:left-12 z-20 pointer-events-none flex flex-col gap-1 font-mono text-[10px] text-zinc-400 select-none">
+        <span className="text-zinc-200 uppercase tracking-widest font-semibold">Gaming Ops</span>
+        <span className="text-zinc-500 uppercase tracking-wider">Protecting Future</span>
+      </div>
+
+      {/* Left Mid-Signal Indicator: "— 50%" */}
+      <div className="absolute top-[48%] left-6 sm:left-12 z-20 pointer-events-none flex items-center gap-2 font-mono text-xs text-zinc-300 select-none">
+        <span className="w-6 h-[2px] bg-[#44f575]" />
+        <span className="text-[#44f575] font-bold">50%</span>
+      </div>
+
+      {/* 5. Left Lower Info Card (Glyph, Thumbnail, Editorial Copy) */}
+      <div 
+        ref={leftCardRef}
+        className="absolute bottom-16 sm:bottom-20 left-6 sm:left-12 z-20 max-w-[280px] sm:max-w-[320px] transition-transform duration-200 ease-out will-change-transform hidden md:flex flex-col gap-3"
+      >
+        <div className="flex items-center gap-3">
+          {/* Abstract Glyph Badge */}
+          <div className="w-10 h-10 rounded-lg bg-zinc-900/80 border border-white/20 flex items-center justify-center shadow-lg backdrop-blur-md">
+            <div className="w-5 h-5 rounded-full border-2 border-white border-r-transparent rotate-45" />
+          </div>
+
+          {/* Mini Thumbnail */}
+          <div className="w-16 h-10 rounded-lg overflow-hidden border border-white/20 bg-black">
+            <img 
+              src="/cyber-techwear-03.jpg" 
+              alt="Cyber techwear study" 
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+        </div>
+
+        {/* Micro-Editorial Manifesto Text */}
+        <p className="text-[10px] sm:text-[11px] font-mono leading-relaxed text-zinc-400 select-none">
+          With expertise in communication/cyber security protocols, we protect against the most aggressive threats across the cyber frontier universe.
+        </p>
+      </div>
+
+      {/* 6. Center Massive Typography ("JOEL JOYSON" & Subtitle - Positioned at Neck Level) */}
+      <div 
+        ref={textLayerRef}
+        className="absolute left-0 right-0 top-[56%] sm:top-[58%] md:top-[60%] z-20 w-full flex flex-col items-center justify-center text-center px-4 pointer-events-none transition-transform duration-200 ease-out will-change-transform"
+      >
+        {/* Subtitle Line with "Next" Tag */}
+        <div className="flex items-center justify-center gap-4 mb-1.5 font-sans">
+          <span className="text-xs sm:text-sm font-semibold tracking-wide text-zinc-200 drop-shadow-md">
+            Creative Technologist &amp; Spatial Architect
           </span>
-          <ChevronDown className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-y-0.5 transition-transform" />
+          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden xs:inline">
+            Next —
+          </span>
+        </div>
+
+        {/* Precision Crosshair Plus Sign above Title */}
+        <div className="my-0.5 text-white/50">
+          <Plus className="w-3.5 h-3.5 text-white/70" />
+        </div>
+
+        {/* Massive Bold Headline: JOEL / JOYSON */}
+        <h1 className="font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter uppercase leading-[0.88] text-white drop-shadow-[0_15px_40px_rgba(0,0,0,0.9)] select-none">
+          <span className="block">JOEL</span>
+          <span className="block">JOYSON</span>
+        </h1>
+
+        {/* Subtle Signature Badge */}
+        <div className="mt-2.5 font-mono text-[10px] sm:text-xs text-zinc-400 tracking-[0.3em] uppercase">
+          // CYBER PROTOCOL &amp; SPATIAL SYSTEMS //
+        </div>
+      </div>
+
+      {/* 7. Right Floating Circular "Our service ↘" Card (Matching Reference Image) */}
+      <div 
+        ref={serviceCardRef}
+        className="absolute top-[38%] right-6 sm:right-14 lg:right-24 z-20 transition-transform duration-200 ease-out will-change-transform"
+      >
+        <a 
+          href="#projects"
+          className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full border border-white/30 p-1 flex items-center justify-center group overflow-hidden bg-black/40 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.8)] cursor-pointer block"
+        >
+          {/* Avatar Inside */}
+          <div className="w-full h-full rounded-full overflow-hidden relative">
+            <img
+              src="/cyber-service-avatar.png"
+              alt="Our Service Avatar"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 brightness-95"
+            />
+            {/* Dark overlay for text contrast */}
+            <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />
+          </div>
+
+          {/* Center Label: "Our service" */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-xs sm:text-sm font-sans font-bold text-white tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+              Our service
+            </span>
+          </div>
+
+          {/* Bottom-Right Arrow Circle: ↘ */}
+          <div className="absolute bottom-1 right-1 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/80 border border-white/40 flex items-center justify-center text-white group-hover:bg-[#44f575] group-hover:text-black group-hover:border-[#44f575] transition-all duration-300 shadow-md">
+            <ArrowDownRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
         </a>
       </div>
-    </main>
+
+      {/* 8. Bottom-Right Vibrant Neon Lime Pill Button: "Catalog" (Matching Reference Image) */}
+      <div className="relative z-30 w-full px-6 sm:px-12 pb-8 flex items-center justify-between pointer-events-auto">
+        <div className="text-[11px] font-mono text-zinc-500 hidden sm:block">
+          STATUS: <span className="text-[#44f575]">ENCRYPTED_ONLINE</span>
+        </div>
+
+        <a
+          href="#projects"
+          className="ml-auto px-7 py-2.5 rounded-full bg-[#44f575] hover:bg-[#5aff8b] text-black font-sans font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 hover:shadow-[0_0_25px_rgba(68,245,117,0.6)] hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg"
+        >
+          <span>Catalog</span>
+        </a>
+      </div>
+    </section>
   );
 };
 
 export const ParallaxHeroDemo: React.FC = () => {
-  return <ParallaxHero title="WILDERNESS" subtitle="3D SPATIAL INTERACTION" />;
+  return <ParallaxHero />;
 };
 
 export default ParallaxHero;
