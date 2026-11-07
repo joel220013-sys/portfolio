@@ -122,11 +122,12 @@ function LogoItem({
   );
 
   if (logo.href) {
+    const isMailto = logo.href.startsWith("mailto:");
     return (
       <a
         href={logo.href}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={isMailto ? undefined : "_blank"}
+        rel={isMailto ? undefined : "noopener noreferrer"}
         className="block no-underline"
         aria-label={logo.name}
       >

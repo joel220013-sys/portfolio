@@ -59,7 +59,7 @@ export const LOGOS: LogoDefinition[] = [
   {
     name: "Gmail",
     color: "#EA4335",
-    href: "mailto:joel220013@gmail.com",
+    href: "mailto:joel220013@gmail.com?subject=Contact%20Joel%20Joyson%20-%20Cybersecurity%20Communication",
     Icon: GmailIcon,
   },
   {
