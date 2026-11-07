@@ -67,25 +67,25 @@ export default function ScrollAnimation() {
     const items = itemsRef.current.filter((el): el is HTMLLIElement => el !== null);
     if (!items.length) return;
 
-    // Initial state: first item bright, rest dimmed
+    // Initial styling: base colors and dimming
     items.forEach((item, index) => {
       const baseHue = (config.start + index * (360 / items.length)) % 360;
       item.style.color = `hsl(${baseHue}, 100%, 65%)`;
 
       gsap.set(item, {
-        opacity: index === 0 ? 1 : 0.15,
-        scale: index === 0 ? 1.05 : 0.95,
+        opacity: index === 0 ? 1 : 0.2,
+        scale: index === 0 ? 1.05 : 0.96,
         filter:
           index === 0
             ? "brightness(1.4) drop-shadow(0 0 30px currentColor)"
-            : "brightness(0.55)",
+            : "brightness(0.6)",
         transformOrigin: "left center",
       });
     });
 
     const triggers: ScrollTrigger[] = [];
 
-    // Scrub hue across total scroll
+    // Global Hue scrub across the section
     if (containerRef.current) {
       const hueTrigger = ScrollTrigger.create({
         trigger: containerRef.current,
@@ -103,27 +103,27 @@ export default function ScrollAnimation() {
       triggers.push(hueTrigger);
     }
 
-    // Scroll lighting effect for each word
+    // Scroll lighting effect for each word (tight gap, activates as it aligns with 'I can')
     items.forEach((item, index) => {
       const trigger = ScrollTrigger.create({
         trigger: item,
-        start: "center 70%",
-        end: "center 30%",
+        start: "center 56%",
+        end: "center 44%",
         onEnter: () => {
           gsap.to(item, {
             opacity: 1,
             scale: 1.05,
-            filter: "brightness(1.4) drop-shadow(0 0 35px currentColor)",
-            duration: 0.25,
+            filter: "brightness(1.45) drop-shadow(0 0 35px currentColor)",
+            duration: 0.2,
             ease: "power2.out",
           });
         },
         onLeave: () => {
           gsap.to(item, {
-            opacity: 0.15,
-            scale: 0.95,
-            filter: "brightness(0.55) drop-shadow(0 0 0px transparent)",
-            duration: 0.25,
+            opacity: 0.2,
+            scale: 0.96,
+            filter: "brightness(0.6) drop-shadow(0 0 0px transparent)",
+            duration: 0.2,
             ease: "power2.out",
           });
         },
@@ -131,18 +131,18 @@ export default function ScrollAnimation() {
           gsap.to(item, {
             opacity: 1,
             scale: 1.05,
-            filter: "brightness(1.4) drop-shadow(0 0 35px currentColor)",
-            duration: 0.25,
+            filter: "brightness(1.45) drop-shadow(0 0 35px currentColor)",
+            duration: 0.2,
             ease: "power2.out",
           });
         },
         onLeaveBack: () => {
           if (index !== 0) {
             gsap.to(item, {
-              opacity: 0.15,
-              scale: 0.95,
-              filter: "brightness(0.55) drop-shadow(0 0 0px transparent)",
-              duration: 0.25,
+              opacity: 0.2,
+              scale: 0.96,
+              filter: "brightness(0.6) drop-shadow(0 0 0px transparent)",
+              duration: 0.2,
               ease: "power2.out",
             });
           }
@@ -152,11 +152,12 @@ export default function ScrollAnimation() {
     });
 
     // Refresh ScrollTrigger to ensure metrics align after DOM paint
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 150);
 
     return () => {
+      clearTimeout(timer);
       ctrl?.dispose();
       triggers.forEach((t) => t.kill());
     };
@@ -165,7 +166,7 @@ export default function ScrollAnimation() {
   return (
     <div
       ref={containerRef}
-      className="you-can-scroll-section relative w-full bg-black text-white pt-16 pb-32"
+      className="you-can-scroll-section relative w-full bg-black text-white"
       style={{
         backgroundImage: `
           linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -174,25 +175,24 @@ export default function ScrollAnimation() {
         backgroundSize: "60px 60px",
       }}
     >
-      {/* Main Content: Sticky 'I can' + Scrolling Animated Words */}
       <main className="relative w-full">
         <section className="relative flex justify-center items-start w-full px-4 sm:px-8 md:px-12">
           {/* Left sticky 'I can' */}
-          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-3 sm:pr-6 md:pr-10 z-20">
-            <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-2 sm:pr-4 md:pr-6 z-20">
+            <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] select-none">
               I can&nbsp;
             </h2>
           </div>
 
-          {/* Right scrolling words */}
-          <ul className="list-none p-0 m-0 z-10">
+          {/* Right scrolling words - tight gap matching reference photos */}
+          <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-4rem)] pb-[calc(50vh-4rem)]">
             {WORDS.map((word, i) => (
               <li
                 key={i}
                 ref={(el) => {
                   itemsRef.current[i] = el;
                 }}
-                className="h-screen flex items-center text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap transition-transform duration-100 select-none"
+                className="h-[110px] sm:h-[135px] md:h-[160px] lg:h-[180px] flex items-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap transition-transform duration-100 select-none"
               >
                 {word}
               </li>
