@@ -1,9 +1,5 @@
-import ScrollAnimation from "@/components/ui/you-can-scroll";
+import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
 
-export default function DemoOne() {
-  return (
-    <div className="w-full h-screen">
-      <ScrollAnimation />
-    </div>
-  );
+export default function Default() {
+  return <RandomLetterSwapNav />;
 }

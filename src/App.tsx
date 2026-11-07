@@ -5,7 +5,6 @@ import LogoCloudSwap from "@/components/ui/logo-clouds";
 import MatrixRain from "@/components/ui/matrix-rain";
 import IntroVideo from "@/components/ui/intro-video";
 import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
-import ScrollAnimation from "@/components/ui/you-can-scroll";
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
@@ -52,8 +51,8 @@ export default function App() {
             <MatrixRain fontSize={16} speed={1.0} />
           </div>
 
-          {/* Center Lamp Lighting Effect & Content (Home Page Hero) */}
-          <div className="relative z-10 min-h-screen">
+          {/* Center Lamp Lighting Effect & Content */}
+          <div className="relative z-10">
             <LampContainer className="bg-black">
               <div className="flex flex-col items-center justify-center w-full">
                 {/* Navigation: Below the blue light and above the image */}
@@ -61,11 +60,6 @@ export default function App() {
                 <LogoCloudSwap className="bg-transparent" />
               </div>
             </LampContainer>
-          </div>
-
-          {/* After Home Page: The Next Full Page Scroll Animation */}
-          <div className="relative z-20 w-full bg-black">
-            <ScrollAnimation />
           </div>
         </motion.div>
       )}
