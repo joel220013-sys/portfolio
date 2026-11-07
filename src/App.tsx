@@ -4,6 +4,7 @@ import { LampContainer } from "@/components/ui/lamp";
 import LogoCloudSwap from "@/components/ui/logo-clouds";
 import MatrixRain from "@/components/ui/matrix-rain";
 import IntroVideo from "@/components/ui/intro-video";
+import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
@@ -53,7 +54,9 @@ export default function App() {
           {/* Center Lamp Lighting Effect & Content */}
           <div className="relative z-10">
             <LampContainer className="bg-black">
-              <div className="flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center w-full">
+                {/* Navigation: Below the blue light and above the image */}
+                <RandomLetterSwapNav className="mb-2 sm:mb-4" />
                 <LogoCloudSwap className="bg-transparent" />
               </div>
             </LampContainer>

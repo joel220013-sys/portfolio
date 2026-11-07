@@ -1,9 +1,5 @@
-import LogoCloudSwap from "@/components/ui/logo-clouds";
+import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
 
 export default function Default() {
-  return (
-    <div className="w-full bg-black text-white">
-      <LogoCloudSwap className="bg-black" />
-    </div>
-  );
+  return <RandomLetterSwapNav />;
 }
