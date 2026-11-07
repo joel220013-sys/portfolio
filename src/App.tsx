@@ -26,27 +26,27 @@ export default function App() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="relative w-full [overflow-x:clip]"
         >
-          {/* Left Falling Green Matrix Rain */}
+          {/* Left Falling Green Matrix Rain - Edge-only on mobile, expanding on desktop */}
           <div
-            className="fixed inset-y-0 left-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 pointer-events-none z-30 overflow-hidden"
+            className="fixed inset-y-0 left-0 w-7 sm:w-12 md:w-36 lg:w-60 xl:w-80 pointer-events-none z-30 overflow-hidden"
             style={{
               WebkitMaskImage:
-                "linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+                "linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
               maskImage:
-                "linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+                "linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
             }}
           >
             <MatrixRain fontSize={16} speed={1.0} />
           </div>
 
-          {/* Right Falling Green Matrix Rain */}
+          {/* Right Falling Green Matrix Rain - Edge-only on mobile, expanding on desktop */}
           <div
-            className="fixed inset-y-0 right-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 pointer-events-none z-30 overflow-hidden"
+            className="fixed inset-y-0 right-0 w-7 sm:w-12 md:w-36 lg:w-60 xl:w-80 pointer-events-none z-30 overflow-hidden"
             style={{
               WebkitMaskImage:
-                "linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+                "linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
               maskImage:
-                "linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+                "linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
             }}
           >
             <MatrixRain fontSize={16} speed={1.0} />

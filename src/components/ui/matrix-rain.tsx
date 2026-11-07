@@ -41,10 +41,14 @@ export function MatrixRain({
     let height = 0;
     let columns: Column[] = [];
 
+    const getActiveFontSize = (w: number) => (w <= 36 ? 12 : fontSize);
+
     const initColumns = () => {
       const parent = canvas.parentElement;
       width = parent?.clientWidth || Math.floor(window.innerWidth * 0.25);
       height = parent?.clientHeight || window.innerHeight;
+
+      const activeFontSize = getActiveFontSize(width);
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -53,7 +57,7 @@ export function MatrixRain({
 
       ctx.scale(dpr, dpr);
 
-      const colCount = Math.max(1, Math.floor(width / fontSize));
+      const colCount = Math.max(1, Math.floor(width / activeFontSize));
       columns = [];
 
       for (let i = 0; i < colCount; i++) {
@@ -63,12 +67,11 @@ export function MatrixRain({
           colChars.push(CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)]);
         }
 
-        // Scatter initial drop positions across the full vertical space so it's instantly active!
         const initialY = Math.random() * height;
         const colSpeed = (Math.random() * 0.8 + 0.7) * speed * 2.2;
 
         columns.push({
-          x: i * fontSize,
+          x: i * activeFontSize,
           y: initialY,
           speed: colSpeed,
           length,
@@ -98,7 +101,8 @@ export function MatrixRain({
       // Clear the canvas completely so it is 100% transparent with NO dark box or borders
       ctx.clearRect(0, 0, width, height);
 
-      ctx.font = `bold ${fontSize}px monospace`;
+      const activeFontSize = getActiveFontSize(width);
+      ctx.font = `bold ${activeFontSize}px monospace`;
       ctx.textBaseline = "top";
 
       for (let i = 0; i < columns.length; i++) {
@@ -111,14 +115,14 @@ export function MatrixRain({
         }
 
         // Advance vertical drop
-        col.y += col.speed * fontSize * deltaTime * 12;
+        col.y += col.speed * activeFontSize * deltaTime * 12;
 
         // Draw trail characters
         for (let j = 0; j < col.length; j++) {
-          const charY = col.y - j * fontSize;
+          const charY = col.y - j * activeFontSize;
 
           // Skip characters off screen
-          if (charY < -fontSize || charY > height) continue;
+          if (charY < -activeFontSize || charY > height) continue;
 
           const char = col.chars[j];
 
@@ -126,13 +130,13 @@ export function MatrixRain({
             // Bright white/mint glowing head
             ctx.fillStyle = headColor;
             ctx.shadowColor = "#4ade80";
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 10;
             ctx.globalAlpha = 1.0;
           } else if (j <= 2) {
             // Luminous neon green immediately behind head
             ctx.fillStyle = color;
             ctx.shadowColor = "#22c55e";
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 6;
             ctx.globalAlpha = 0.95;
           } else {
             // Smoothly fading trailing characters
@@ -147,8 +151,8 @@ export function MatrixRain({
         }
 
         // Reset drop when tail passes bottom of screen
-        if (col.y - col.length * fontSize > height) {
-          col.y = -fontSize * (Math.floor(Math.random() * 6) + 1);
+        if (col.y - col.length * activeFontSize > height) {
+          col.y = -activeFontSize * (Math.floor(Math.random() * 6) + 1);
           col.speed = (Math.random() * 0.8 + 0.7) * speed * 2.2;
           col.length = Math.floor(Math.random() * 16) + 12;
         }
