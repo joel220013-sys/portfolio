@@ -1,16 +1,20 @@
 import * as React from "react";
 import {
   Zap,
-  Boxes,
+  Mail,
   Layers,
   ShieldCheck,
   Sparkles,
   Cloud,
   Flame,
-  Code2,
   Cpu,
 } from "lucide-react";
-import { SupabaseIcon, GithubIcon, LinkedinIcon } from "./brand-icons";
+import {
+  SupabaseIcon,
+  GithubIcon,
+  LinkedinIcon,
+  TryHackMeIcon,
+} from "./brand-icons";
 
 export type LogoDefinition = {
   name: string;
@@ -47,14 +51,16 @@ export const LOGOS: LogoDefinition[] = [
     Icon: LinkedinIcon,
   },
   {
-    name: "Prism Labs",
-    color: "#EC4899",
-    Icon: Code2,
+    name: "TryHackMe",
+    color: "#EA2A2A",
+    href: "https://tryhackme.com/p/joel220013",
+    Icon: TryHackMeIcon,
   },
   {
-    name: "Tailwind",
-    color: "#06B6D4",
-    Icon: Boxes,
+    name: "Email",
+    color: "#EA4335",
+    href: "mailto:joel220013@gmail.com",
+    Icon: Mail,
   },
   {
     name: "Next.js",
