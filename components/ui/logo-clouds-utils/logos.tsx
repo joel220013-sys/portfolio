@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   Zap,
-  Mail,
   Layers,
   ShieldCheck,
   Sparkles,
@@ -14,6 +13,7 @@ import {
   GithubIcon,
   LinkedinIcon,
   TryHackMeIcon,
+  GmailIcon,
 } from "./brand-icons";
 
 export type LogoDefinition = {
@@ -57,10 +57,10 @@ export const LOGOS: LogoDefinition[] = [
     Icon: TryHackMeIcon,
   },
   {
-    name: "Email",
+    name: "Gmail",
     color: "#EA4335",
     href: "mailto:joel220013@gmail.com",
-    Icon: Mail,
+    Icon: GmailIcon,
   },
   {
     name: "Next.js",
