@@ -1,184 +1,227 @@
 "use client";
-import React, { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import "@/index.css";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { Pane } from "tweakpane";
 
+const WORDS = [
+  "design.",
+  "prototype.",
+  "solve.",
+  "build.",
+  "develop.",
+  "debug.",
+  "learn.",
+  "cook.",
+  "ship.",
+  "prompt.",
+  "collaborate.",
+  "create.",
+  "inspire.",
+  "follow.",
+  "innovate.",
+  "test.",
+  "optimize.",
+  "teach.",
+  "visualize.",
+  "transform.",
+  "scale.",
+  "do it.",
+];
+
 export default function ScrollAnimation() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const config: {
-      theme: string;
-      animate: boolean;
-      snap: boolean;
-      start: number;
-      end: number;
-      scroll: boolean;
-      debug: boolean;
-    } = {
+    const config = {
       theme: "dark",
       animate: true,
       snap: true,
-      start: gsap.utils.random(0, 100, 1),
-      end: gsap.utils.random(900, 1000, 1),
+      start: 0,
+      end: 360,
       scroll: true,
       debug: false,
     };
 
-    const ctrl = new Pane({ title: "Config", expanded: false });
-    let items: HTMLElement[] | undefined;
-    let scrollerScrub: ScrollTrigger | undefined;
-    let dimmerScrub: ScrollTrigger | undefined;
-    let chromaEntry: gsap.core.Tween | undefined;
-    let chromaExit: gsap.core.Tween | undefined;
-
-    const update = () => {
-      document.documentElement.dataset.theme = config.theme;
-      document.documentElement.dataset.syncScrollbar = String(config.scroll);
-      document.documentElement.dataset.animate = String(config.animate);
-      document.documentElement.dataset.snap = String(config.snap);
-      document.documentElement.dataset.debug = String(config.debug);
-      document.documentElement.style.setProperty("--start", String(config.start));
-      document.documentElement.style.setProperty("--hue", String(config.start));
-      document.documentElement.style.setProperty("--end", String(config.end));
-
-      if (!config.animate) {
-        chromaEntry?.scrollTrigger?.disable(true, false);
-        chromaExit?.scrollTrigger?.disable(true, false);
-        dimmerScrub?.disable(true, false);
-        scrollerScrub?.disable(true, false);
-        if (items) gsap.set(items, { opacity: 1 });
-        gsap.set(document.documentElement, { "--chroma": 0 });
-      } else {
-        if (items) gsap.set(items, { opacity: (i: number) => (i !== 0 ? 0.2 : 1) });
-        dimmerScrub?.enable(true, true);
-        scrollerScrub?.enable(true, true);
-        chromaEntry?.scrollTrigger?.enable(true, true);
-        chromaExit?.scrollTrigger?.enable(true, true);
-      }
-    };
-
-    ctrl.addBinding(config, "animate", { label: "Animate" });
-    ctrl.addBinding(config, "snap", { label: "Snap" });
-    ctrl.addBinding(config, "start", { label: "Hue Start", min: 0, max: 1000, step: 1 });
-    ctrl.addBinding(config, "end", { label: "Hue End", min: 0, max: 1000, step: 1 });
-    ctrl.addBinding(config, "scroll", { label: "Scrollbar" });
-    ctrl.addBinding(config, "debug", { label: "Debug" });
-    ctrl.addBinding(config, "theme", {
-      label: "Theme",
-      options: { System: "system", Light: "light", Dark: "dark" },
-    });
-
-    ctrl.on("change", update);
-
-    // Fallback without CSS scroll-timeline
-    if (!CSS.supports("(animation-timeline: scroll()) and (animation-range: 0% 100%)")) {
-      items = gsap.utils.toArray(".you-can-scroll-section ul li");
-      if (items && items.length > 0) {
-        gsap.set(items, { opacity: (i: number) => (i !== 0 ? 0.2 : 1) });
-
-        const dimmer = gsap
-          .timeline()
-          .to(items.slice(1), { opacity: 1, stagger: 0.5 })
-          .to(items.slice(0, items.length - 1), { opacity: 0.2, stagger: 0.5 }, 0);
-
-        dimmerScrub = ScrollTrigger.create({
-          trigger: items[0],
-          endTrigger: items[items.length - 1],
-          start: "center center",
-          end: "center center",
-          animation: dimmer,
-          scrub: 0.2,
-        });
-
-        const scroller = gsap.timeline().fromTo(
-          document.documentElement,
-          { "--hue": config.start },
-          { "--hue": config.end, ease: "none" }
-        );
-
-        scrollerScrub = ScrollTrigger.create({
-          trigger: items[0],
-          endTrigger: items[items.length - 1],
-          start: "center center",
-          end: "center center",
-          animation: scroller,
-          scrub: 0.2,
-        });
-
-        chromaEntry = gsap.fromTo(
-          document.documentElement,
-          { "--chroma": 0 },
-          {
-            "--chroma": 0.3,
-            ease: "none",
-            scrollTrigger: {
-              scrub: 0.2,
-              trigger: items[0],
-              start: "center center+=40",
-              end: "center center",
-            },
-          }
-        );
-
-        chromaExit = gsap.fromTo(
-          document.documentElement,
-          { "--chroma": 0.3 },
-          {
-            "--chroma": 0,
-            ease: "none",
-            scrollTrigger: {
-              scrub: 0.2,
-              trigger: items[items.length - 2],
-              start: "center center",
-              end: "center center-=40",
-            },
-          }
-        );
-      }
+    let ctrl: Pane | null = null;
+    try {
+      ctrl = new Pane({ title: "Config", expanded: false });
+      ctrl.addBinding(config, "animate", { label: "Animate" });
+      ctrl.addBinding(config, "snap", { label: "Snap" });
+      ctrl.addBinding(config, "start", { label: "Hue Start", min: 0, max: 1000, step: 1 });
+      ctrl.addBinding(config, "end", { label: "Hue End", min: 0, max: 1000, step: 1 });
+      ctrl.addBinding(config, "scroll", { label: "Scrollbar" });
+      ctrl.addBinding(config, "debug", { label: "Debug" });
+      ctrl.addBinding(config, "theme", {
+        label: "Theme",
+        options: { System: "system", Light: "light", Dark: "dark" },
+      });
+    } catch {
+      // Graceful fallback if Tweakpane DOM is blocked
     }
 
-    update();
+    const items = itemsRef.current.filter((el): el is HTMLLIElement => el !== null);
+    if (!items.length) return;
+
+    // Initial state: first item bright, rest dimmed
+    items.forEach((item, index) => {
+      const baseHue = (config.start + index * (360 / items.length)) % 360;
+      item.style.color = `hsl(${baseHue}, 100%, 65%)`;
+
+      gsap.set(item, {
+        opacity: index === 0 ? 1 : 0.15,
+        scale: index === 0 ? 1.05 : 0.95,
+        filter:
+          index === 0
+            ? "brightness(1.4) drop-shadow(0 0 30px currentColor)"
+            : "brightness(0.55)",
+        transformOrigin: "left center",
+      });
+    });
+
+    const triggers: ScrollTrigger[] = [];
+
+    // Scrub hue across total scroll
+    if (containerRef.current) {
+      const hueTrigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+        onUpdate: (self) => {
+          const currentHue = gsap.utils.interpolate(config.start, config.end, self.progress);
+          items.forEach((item, i) => {
+            const h = (currentHue + i * (360 / items.length)) % 360;
+            item.style.color = `hsl(${h}, 100%, 65%)`;
+          });
+        },
+      });
+      triggers.push(hueTrigger);
+    }
+
+    // Scroll lighting effect for each word
+    items.forEach((item, index) => {
+      const trigger = ScrollTrigger.create({
+        trigger: item,
+        start: "center 70%",
+        end: "center 30%",
+        onEnter: () => {
+          gsap.to(item, {
+            opacity: 1,
+            scale: 1.05,
+            filter: "brightness(1.4) drop-shadow(0 0 35px currentColor)",
+            duration: 0.25,
+            ease: "power2.out",
+          });
+        },
+        onLeave: () => {
+          gsap.to(item, {
+            opacity: 0.15,
+            scale: 0.95,
+            filter: "brightness(0.55) drop-shadow(0 0 0px transparent)",
+            duration: 0.25,
+            ease: "power2.out",
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(item, {
+            opacity: 1,
+            scale: 1.05,
+            filter: "brightness(1.4) drop-shadow(0 0 35px currentColor)",
+            duration: 0.25,
+            ease: "power2.out",
+          });
+        },
+        onLeaveBack: () => {
+          if (index !== 0) {
+            gsap.to(item, {
+              opacity: 0.15,
+              scale: 0.95,
+              filter: "brightness(0.55) drop-shadow(0 0 0px transparent)",
+              duration: 0.25,
+              ease: "power2.out",
+            });
+          }
+        },
+      });
+      triggers.push(trigger);
+    });
+
+    // Refresh ScrollTrigger to ensure metrics align after DOM paint
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
 
     return () => {
-      ctrl.dispose();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      ctrl?.dispose();
+      triggers.forEach((t) => t.kill());
     };
   }, []);
 
   return (
-    <div className="you-can-scroll-section">
-      <header>
-        <h1
-          className="fluid"
-          style={{ fontSize: "calc(var(--fluid-type) * 2)" }}
-        >
+    <div
+      ref={containerRef}
+      className="you-can-scroll-section relative w-full bg-black text-white"
+      style={{
+        backgroundImage: `
+          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: "60px 60px",
+      }}
+    >
+      {/* Intro Header */}
+      <header className="min-h-screen flex flex-col items-center justify-center text-center px-6">
+        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extrabold tracking-tighter text-zinc-100 leading-none">
           you can<br />scroll.
         </h1>
+        <div className="mt-8 flex flex-col items-center text-zinc-500 font-mono text-sm animate-pulse">
+          <span>&darr; scroll down &darr;</span>
+        </div>
       </header>
-      <main>
-        <section className="content fluid">
-          <h2>
-            <span aria-hidden="true">you can&nbsp;</span>
-            <span className="sr-only">you can ship things.</span>
-          </h2>
-          <ul aria-hidden="true" style={{ "--count": 22 } as React.CSSProperties}>
-            {[
-              "design.","prototype.","solve.","build.","develop.","debug.","learn.","cook.","ship.","prompt.",
-              "collaborate.","create.","inspire.","follow.","innovate.","test.","optimize.","teach.","visualize.",
-              "transform.","scale.","do it."
-            ].map((text, i) => (
-              <li key={i} style={{ "--i": i } as React.CSSProperties}>{text}</li>
+
+      {/* Main Content: Sticky 'you can' + Scrolling Animated Words */}
+      <main className="relative w-full">
+        <section className="relative flex justify-center items-start w-full px-4 sm:px-8 md:px-12">
+          {/* Left sticky 'you can' */}
+          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-3 sm:pr-6 md:pr-10 z-20">
+            <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              you can&nbsp;
+            </h2>
+          </div>
+
+          {/* Right scrolling words */}
+          <ul className="list-none p-0 m-0 z-10">
+            {WORDS.map((word, i) => (
+              <li
+                key={i}
+                ref={(el) => {
+                  itemsRef.current[i] = el;
+                }}
+                className="h-screen flex items-center text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap transition-transform duration-100 select-none"
+              >
+                {word}
+              </li>
             ))}
           </ul>
         </section>
-        <section>
-          <h2 className="fluid">fin.</h2>
+
+        {/* Closing 'fin.' Section */}
+        <section className="min-h-screen flex items-center justify-center">
+          <h2 className="text-6xl sm:text-8xl md:text-9xl font-extrabold tracking-tighter text-zinc-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.25)]">
+            fin.
+          </h2>
         </section>
       </main>
-      <footer>ʕ⊙ᴥ⊙ʔ jh3yy &copy; 2024</footer>
+
+      {/* Footer */}
+      <footer className="py-16 text-center text-zinc-500 font-mono text-sm border-t border-zinc-900">
+        ʕ⊙ᴥ⊙ʔ jh3yy &copy; 2024
+      </footer>
     </div>
   );
 }

@@ -11,20 +11,20 @@ export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-black text-white [overflow-x:clip]">
       {/* Intro Video Overlay */}
       {!introFinished && (
         <IntroVideo onComplete={() => setIntroFinished(true)} />
       )}
 
-      {/* Main Website Content - Mounts and triggers blue light animation right after video ends */}
+      {/* Main Website Content */}
       {introFinished && (
         <motion.div
           key="portfolio-content"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative w-full min-h-screen"
+          className="relative w-full [overflow-x:clip]"
         >
           {/* Left Falling Green Matrix Rain */}
           <div
@@ -58,13 +58,20 @@ export default function App() {
               <div className="flex flex-col items-center justify-center w-full">
                 {/* Navigation: Below the blue light and above the image */}
                 <RandomLetterSwapNav className="mb-2 sm:mb-4" />
-                <LogoCloudSwap className="bg-transparent" />
+                <div id="profile-links" className="w-full">
+                  <LogoCloudSwap className="bg-transparent" />
+                </div>
               </div>
             </LampContainer>
           </div>
 
+          {/* Scroll Down Prompt */}
+          <div className="relative z-20 flex flex-col items-center justify-center py-6 bg-black text-zinc-500 font-mono text-xs tracking-widest uppercase">
+            <span className="mb-2 animate-pulse">&darr; SCROLL DOWN TO EXPLORE &darr;</span>
+          </div>
+
           {/* Scrolling Down Animation Section */}
-          <div className="relative z-20 w-full bg-black">
+          <div id="scroll-section" className="relative z-20 w-full bg-black [overflow-x:clip]">
             <ScrollAnimation />
           </div>
         </motion.div>
