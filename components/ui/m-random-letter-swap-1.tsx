@@ -22,3 +22,4 @@ export default function RandomLetterSwapNav({ className }: { className?: string 
     </div>
   );
 }
+

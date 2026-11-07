@@ -24,6 +24,21 @@
     --input: 0 0% 14%;
     --ring: 0 0% 83.1%;
     --radius: 0.5rem;
+
+    /* You Can Scroll animation configuration */
+    --start: 0;
+    --end: 360;
+    --hue: 0;
+    --chroma: 0;
+    --lightness: 65%;
+    --base-chroma: 0.3;
+    --font-size-min: 14;
+    --font-size-max: 20;
+    --font-ratio-min: 1.1;
+    --font-ratio-max: 1.33;
+    --font-width-min: 375;
+    --font-width-max: 1500;
+    --fluid-type: clamp(2rem, 5vw + 1rem, 4.5rem);
   }
 
   .dark {
@@ -55,5 +70,156 @@
   }
   body {
     @apply bg-black text-white;
+  }
+}
+
+@keyframes change {
+  to {
+    --hue: var(--end);
+  }
+}
+
+@keyframes chroma-on {
+  to {
+    --chroma: 0.3;
+  }
+}
+
+@keyframes chroma-off {
+  to {
+    --chroma: 0;
+  }
+}
+
+@keyframes brighten {
+  0% {
+    opacity: var(--start-opacity, 0.2);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(var(--brightness, 1.2));
+  }
+  100% {
+    opacity: var(--end-opacity, 0.2);
+  }
+}
+
+/* You Can Scroll Component Layout & Fluid Typography */
+.you-can-scroll-section {
+  color: oklch(var(--lightness, 65%) var(--chroma, 0) var(--hue, 0));
+  background-color: #000;
+  font-family: inherit;
+  position: relative;
+  width: 100%;
+}
+
+.you-can-scroll-section header {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.you-can-scroll-section header h1 {
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  text-transform: lowercase;
+}
+
+.you-can-scroll-section section.content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 0 1rem;
+}
+
+.you-can-scroll-section section.content h2 {
+  position: sticky;
+  top: 50vh;
+  transform: translateY(-50%);
+  font-size: calc(var(--fluid-type) * 2);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+}
+
+.you-can-scroll-section section.content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.you-can-scroll-section section.content ul li {
+  font-size: calc(var(--fluid-type) * 2);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  opacity: 0.2;
+}
+
+.you-can-scroll-section section.content ul li:first-child {
+  opacity: 1;
+}
+
+.you-can-scroll-section section:last-of-type {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.you-can-scroll-section section:last-of-type h2 {
+  font-size: calc(var(--fluid-type) * 2);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.you-can-scroll-section footer {
+  padding: 4rem 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  opacity: 0.6;
+  font-family: monospace;
+}
+
+/* Native CSS Scroll-driven Animations when supported */
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  :root[data-animate="true"] {
+    animation: change both linear;
+    animation-timeline: scroll(root);
+  }
+
+  [data-animate="true"] .you-can-scroll-section header {
+    animation: chroma-on both linear;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+
+  [data-animate="true"] .you-can-scroll-section section.content ul li {
+    animation: brighten both linear;
+    animation-timeline: view();
+    animation-range: cover 40% cover 60%;
+  }
+
+  [data-animate="true"] .you-can-scroll-section section:last-of-type {
+    animation: chroma-off both linear;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
   }
 }
