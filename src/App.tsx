@@ -65,11 +65,6 @@ export default function App() {
             </LampContainer>
           </div>
 
-          {/* Scroll Down Prompt */}
-          <div className="relative z-20 flex flex-col items-center justify-center py-6 bg-black text-zinc-500 font-mono text-xs tracking-widest uppercase">
-            <span className="mb-2 animate-pulse">&darr; SCROLL DOWN TO EXPLORE &darr;</span>
-          </div>
-
           {/* Scrolling Down Animation Section */}
           <div id="scroll-section" className="relative z-20 w-full bg-black [overflow-x:clip]">
             <ScrollAnimation />

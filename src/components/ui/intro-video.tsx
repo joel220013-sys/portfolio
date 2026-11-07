@@ -44,7 +44,7 @@ export function IntroVideo({ onComplete }: IntroVideoProps) {
       <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl aspect-square flex items-center justify-center">
         <video
           ref={videoRef}
-          src="/intro.mp4"
+          src={`${import.meta.env.BASE_URL}intro.mp4`}
           autoPlay
           muted
           playsInline

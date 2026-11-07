@@ -165,7 +165,7 @@ export default function ScrollAnimation() {
   return (
     <div
       ref={containerRef}
-      className="you-can-scroll-section relative w-full bg-black text-white"
+      className="you-can-scroll-section relative w-full bg-black text-white pt-16 pb-32"
       style={{
         backgroundImage: `
           linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -174,23 +174,13 @@ export default function ScrollAnimation() {
         backgroundSize: "60px 60px",
       }}
     >
-      {/* Intro Header */}
-      <header className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extrabold tracking-tighter text-zinc-100 leading-none">
-          you can<br />scroll.
-        </h1>
-        <div className="mt-8 flex flex-col items-center text-zinc-500 font-mono text-sm animate-pulse">
-          <span>&darr; scroll down &darr;</span>
-        </div>
-      </header>
-
-      {/* Main Content: Sticky 'you can' + Scrolling Animated Words */}
+      {/* Main Content: Sticky 'I can' + Scrolling Animated Words */}
       <main className="relative w-full">
         <section className="relative flex justify-center items-start w-full px-4 sm:px-8 md:px-12">
-          {/* Left sticky 'you can' */}
+          {/* Left sticky 'I can' */}
           <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-3 sm:pr-6 md:pr-10 z-20">
             <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-              you can&nbsp;
+              I can&nbsp;
             </h2>
           </div>
 
@@ -209,19 +199,7 @@ export default function ScrollAnimation() {
             ))}
           </ul>
         </section>
-
-        {/* Closing 'fin.' Section */}
-        <section className="min-h-screen flex items-center justify-center">
-          <h2 className="text-6xl sm:text-8xl md:text-9xl font-extrabold tracking-tighter text-zinc-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.25)]">
-            fin.
-          </h2>
-        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="py-16 text-center text-zinc-500 font-mono text-sm border-t border-zinc-900">
-        ʕ⊙ᴥ⊙ʔ jh3yy &copy; 2024
-      </footer>
     </div>
   );
 }
