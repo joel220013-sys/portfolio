@@ -5,6 +5,7 @@ import LogoCloudSwap from "@/components/ui/logo-clouds";
 import MatrixRain from "@/components/ui/matrix-rain";
 import IntroVideo from "@/components/ui/intro-video";
 import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
+import ScrollAnimation from "@/components/ui/you-can-scroll";
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
@@ -60,6 +61,11 @@ export default function App() {
                 <LogoCloudSwap className="bg-transparent" />
               </div>
             </LampContainer>
+          </div>
+
+          {/* Scrolling Down Animation Section */}
+          <div className="relative z-20 w-full bg-black">
+            <ScrollAnimation />
           </div>
         </motion.div>
       )}
