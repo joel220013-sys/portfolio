@@ -1,33 +1,30 @@
 "use client";
 import { useEffect, useRef } from "react";
 import "@/index.css";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import { Pane } from "tweakpane";
 
 const WORDS = [
-  "design.",
-  "prototype.",
-  "solve.",
-  "build.",
-  "develop.",
-  "debug.",
-  "learn.",
-  "cook.",
-  "ship.",
-  "prompt.",
-  "collaborate.",
-  "create.",
-  "inspire.",
-  "follow.",
-  "innovate.",
-  "test.",
-  "optimize.",
-  "teach.",
-  "visualize.",
-  "transform.",
-  "scale.",
-  "do it.",
+  { text: "design.", color: "#ff4d4d" },
+  { text: "prototype.", color: "#ff7a29" },
+  { text: "solve.", color: "#ffaa00" },
+  { text: "build.", color: "#facc15" },
+  { text: "develop.", color: "#00f0b5" },
+  { text: "debug.", color: "#00e5ff" },
+  { text: "learn.", color: "#38bdf8" },
+  { text: "cook.", color: "#60a5fa" },
+  { text: "ship.", color: "#818cf8" },
+  { text: "prompt.", color: "#c084fc" },
+  { text: "collaborate.", color: "#e879f9" },
+  { text: "create.", color: "#00ff88" },
+  { text: "inspire.", color: "#06b6d4" },
+  { text: "follow.", color: "#0284c7" },
+  { text: "innovate.", color: "#10b981" },
+  { text: "test.", color: "#a3e635" },
+  { text: "optimize.", color: "#fbbf24" },
+  { text: "teach.", color: "#fb923c" },
+  { text: "visualize.", color: "#f87171" },
+  { text: "transform.", color: "#f472b6" },
+  { text: "scale.", color: "#a78bfa" },
+  { text: "do it.", color: "#00f5d4" },
 ];
 
 export default function ScrollAnimation() {
@@ -35,131 +32,72 @@ export default function ScrollAnimation() {
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const config = {
-      theme: "dark",
-      animate: true,
-      snap: true,
-      start: 0,
-      end: 360,
-      scroll: true,
-      debug: false,
-    };
-
-    let ctrl: Pane | null = null;
-    try {
-      ctrl = new Pane({ title: "Config", expanded: false });
-      ctrl.addBinding(config, "animate", { label: "Animate" });
-      ctrl.addBinding(config, "snap", { label: "Snap" });
-      ctrl.addBinding(config, "start", { label: "Hue Start", min: 0, max: 1000, step: 1 });
-      ctrl.addBinding(config, "end", { label: "Hue End", min: 0, max: 1000, step: 1 });
-      ctrl.addBinding(config, "scroll", { label: "Scrollbar" });
-      ctrl.addBinding(config, "debug", { label: "Debug" });
-      ctrl.addBinding(config, "theme", {
-        label: "Theme",
-        options: { System: "system", Light: "light", Dark: "dark" },
-      });
-    } catch {
-      // Graceful fallback if Tweakpane DOM is blocked
-    }
-
     const items = itemsRef.current.filter((el): el is HTMLLIElement => el !== null);
     if (!items.length) return;
 
-    // Initial styling: base colors and dimming
-    items.forEach((item, index) => {
-      const baseHue = (config.start + index * (360 / items.length)) % 360;
-      item.style.color = `hsl(${baseHue}, 100%, 65%)`;
+    let ticking = false;
 
-      gsap.set(item, {
-        opacity: index === 0 ? 1 : 0.2,
-        scale: index === 0 ? 1.05 : 0.96,
-        filter:
-          index === 0
-            ? "brightness(1.4) drop-shadow(0 0 30px currentColor)"
-            : "brightness(0.6)",
-        transformOrigin: "left center",
-      });
-    });
+    const updateActiveWords = () => {
+      const centerY = window.innerHeight / 2;
+      let closestIndex = 0;
+      let minDistance = Infinity;
 
-    const triggers: ScrollTrigger[] = [];
+      // Find the word whose center is closest to 'I can' (window center)
+      for (let i = 0; i < items.length; i++) {
+        const rect = items[i].getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(itemCenter - centerY);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestIndex = i;
+        }
+      }
 
-    // Global Hue scrub across the section
-    if (containerRef.current) {
-      const hueTrigger = ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => {
-          const currentHue = gsap.utils.interpolate(config.start, config.end, self.progress);
-          items.forEach((item, i) => {
-            const h = (currentHue + i * (360 / items.length)) % 360;
-            item.style.color = `hsl(${h}, 100%, 65%)`;
-          });
-        },
-      });
-      triggers.push(hueTrigger);
-    }
+      // Apply bright illumination to closest word and smooth colors/dimming to neighbors
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const distFromActive = Math.abs(i - closestIndex);
 
-    // Scroll lighting effect for each word (tight gap, activates as it aligns with 'I can')
-    items.forEach((item, index) => {
-      const trigger = ScrollTrigger.create({
-        trigger: item,
-        start: "center 56%",
-        end: "center 44%",
-        onEnter: () => {
-          gsap.to(item, {
-            opacity: 1,
-            scale: 1.05,
-            filter: "brightness(1.45) drop-shadow(0 0 35px currentColor)",
-            duration: 0.2,
-            ease: "power2.out",
-          });
-        },
-        onLeave: () => {
-          gsap.to(item, {
-            opacity: 0.2,
-            scale: 0.96,
-            filter: "brightness(0.6) drop-shadow(0 0 0px transparent)",
-            duration: 0.2,
-            ease: "power2.out",
-          });
-        },
-        onEnterBack: () => {
-          gsap.to(item, {
-            opacity: 1,
-            scale: 1.05,
-            filter: "brightness(1.45) drop-shadow(0 0 35px currentColor)",
-            duration: 0.2,
-            ease: "power2.out",
-          });
-        },
-        onLeaveBack: () => {
-          if (index !== 0) {
-            gsap.to(item, {
-              opacity: 0.2,
-              scale: 0.96,
-              filter: "brightness(0.6) drop-shadow(0 0 0px transparent)",
-              duration: 0.2,
-              ease: "power2.out",
-            });
-          }
-        },
-      });
-      triggers.push(trigger);
-    });
+        if (distFromActive === 0) {
+          // ACTIVE WORD: 100% full bright neon glow & scale
+          item.style.opacity = "1";
+          item.style.transform = "scale(1.08)";
+          item.style.filter = "brightness(1.5) drop-shadow(0 0 35px currentColor)";
+          item.style.zIndex = "10";
+        } else if (distFromActive === 1) {
+          // Direct neighbors: visible stacked lines (matching reference screenshots)
+          item.style.opacity = "0.32";
+          item.style.transform = "scale(0.98)";
+          item.style.filter = "brightness(0.75) drop-shadow(0 0 0px transparent)";
+          item.style.zIndex = "1";
+        } else {
+          // Further lines: dimmed background stack
+          item.style.opacity = "0.18";
+          item.style.transform = "scale(0.95)";
+          item.style.filter = "brightness(0.6) drop-shadow(0 0 0px transparent)";
+          item.style.zIndex = "0";
+        }
+      }
 
-    // Refresh ScrollTrigger to ensure metrics align after DOM paint
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 150);
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateActiveWords);
+        ticking = true;
+      }
+    };
+
+    // Initial update
+    updateActiveWords();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
 
     return () => {
-      clearTimeout(timer);
-      ctrl?.dispose();
-      triggers.forEach((t) => t.kill());
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, []);
 
@@ -184,17 +122,23 @@ export default function ScrollAnimation() {
             </h2>
           </div>
 
-          {/* Right scrolling words - tight gap matching reference photos */}
+          {/* Right scrolling words: tight vertical gap with 5 stacked lines visible */}
           <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-4rem)] pb-[calc(50vh-4rem)]">
-            {WORDS.map((word, i) => (
+            {WORDS.map((item, i) => (
               <li
-                key={i}
+                key={item.text}
                 ref={(el) => {
                   itemsRef.current[i] = el;
                 }}
-                className="h-[110px] sm:h-[135px] md:h-[160px] lg:h-[180px] flex items-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap transition-transform duration-100 select-none"
+                style={{
+                  color: item.color,
+                  transition:
+                    "opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                  willChange: "transform, opacity, filter",
+                }}
+                className="h-[110px] sm:h-[135px] md:h-[160px] lg:h-[180px] flex items-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap select-none"
               >
-                {word}
+                {item.text}
               </li>
             ))}
           </ul>
