@@ -61,11 +61,11 @@ export default function ScrollAnimation() {
         if (distFromActive === 0) {
           // ACTIVE WORD: 100% full bright neon glow & scale
           item.style.opacity = "1";
-          item.style.transform = "scale(1.08)";
-          item.style.filter = "brightness(1.5) drop-shadow(0 0 35px currentColor)";
+          item.style.transform = "scale(1.06)";
+          item.style.filter = "brightness(1.5) drop-shadow(0 0 25px currentColor)";
           item.style.zIndex = "10";
         } else if (distFromActive === 1) {
-          // Direct neighbors: visible stacked lines (matching reference screenshots)
+          // Direct neighbors: visible stacked lines
           item.style.opacity = "0.32";
           item.style.transform = "scale(0.98)";
           item.style.filter = "brightness(0.75) drop-shadow(0 0 0px transparent)";
@@ -115,15 +115,15 @@ export default function ScrollAnimation() {
     >
       <main className="relative w-full">
         <section className="relative flex justify-center items-start w-full px-4 sm:px-8 md:px-12">
-          {/* Left sticky 'I can' */}
-          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-2 sm:pr-4 md:pr-6 z-20">
-            <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] select-none">
+          {/* Left sticky 'I can' (small-medium size) */}
+          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-2 sm:pr-3 md:pr-4 z-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] select-none">
               I can&nbsp;
             </h2>
           </div>
 
-          {/* Right scrolling words: tight vertical gap with 5 stacked lines visible */}
-          <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-4rem)] pb-[calc(50vh-4rem)]">
+          {/* Right scrolling words: small-medium size with tight vertical stack */}
+          <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-2rem)] pb-[calc(50vh-2rem)]">
             {WORDS.map((item, i) => (
               <li
                 key={item.text}
@@ -136,7 +136,7 @@ export default function ScrollAnimation() {
                     "opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
                   willChange: "transform, opacity, filter",
                 }}
-                className="h-[110px] sm:h-[135px] md:h-[160px] lg:h-[180px] flex items-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight whitespace-nowrap select-none"
+                className="h-[60px] sm:h-[75px] md:h-[90px] lg:h-[105px] flex items-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight whitespace-nowrap select-none"
               >
                 {item.text}
               </li>
