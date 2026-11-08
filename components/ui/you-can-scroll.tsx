@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 import "@/index.css";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 const WORDS = [
   { text: "design.", color: "#ff4d4d" },
@@ -8,86 +10,90 @@ const WORDS = [
   { text: "solve.", color: "#ffaa00" },
   { text: "build.", color: "#facc15" },
   { text: "develop.", color: "#00f0b5" },
+  { text: "attack.", color: "#ff2255" },
+  { text: "defend.", color: "#00d8ff" },
 ];
 
 export default function ScrollAnimation() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const section = sectionRef.current;
+    const list = listRef.current;
     const items = itemsRef.current.filter((el): el is HTMLLIElement => el !== null);
-    if (!items.length) return;
+    if (!section || !list || items.length === 0) return;
 
-    let ticking = false;
+    const ctx = gsap.context(() => {
+      const getLineHeight = () => items[0]?.offsetHeight || 95;
+      let lineHeight = getLineHeight();
+      let totalTravel = (items.length - 1) * lineHeight;
 
-    const updateActiveWords = () => {
-      const centerY = window.innerHeight / 2;
-      let closestIndex = 0;
-      let minDistance = Infinity;
+      const updateIllumination = (progress: number) => {
+        const floatIndex = progress * (items.length - 1);
 
-      // Find the word whose center is closest to 'I can' (window center)
-      for (let i = 0; i < items.length; i++) {
-        const rect = items[i].getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(itemCenter - centerY);
-        if (dist < minDistance) {
-          minDistance = dist;
-          closestIndex = i;
-        }
-      }
+        items.forEach((item, index) => {
+          const dist = Math.abs(index - floatIndex);
+          // Smooth bell curve for active word
+          const factor = Math.max(0, 1 - dist / 1.15);
+          const smoothFactor = factor * factor * (3 - 2 * factor);
 
-      // Apply bright illumination to closest word and smooth colors/dimming to neighbors
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const distFromActive = Math.abs(i - closestIndex);
+          const opacity = 0.2 + smoothFactor * 0.8;
+          const scale = 0.95 + smoothFactor * 0.12;
+          const glow = smoothFactor * 30;
+          const brightness = 0.65 + smoothFactor * 0.85;
 
-        if (distFromActive === 0) {
-          // ACTIVE WORD: 100% full bright neon glow & scale
-          item.style.opacity = "1";
-          item.style.transform = "scale(1.06)";
-          item.style.filter = "brightness(1.5) drop-shadow(0 0 25px currentColor)";
-          item.style.zIndex = "10";
-        } else if (distFromActive === 1) {
-          // Direct neighbors: visible stacked lines
-          item.style.opacity = "0.32";
-          item.style.transform = "scale(0.98)";
-          item.style.filter = "brightness(0.75) drop-shadow(0 0 0px transparent)";
-          item.style.zIndex = "1";
-        } else {
-          // Further lines: dimmed background stack
-          item.style.opacity = "0.18";
-          item.style.transform = "scale(0.95)";
-          item.style.filter = "brightness(0.6) drop-shadow(0 0 0px transparent)";
-          item.style.zIndex = "0";
-        }
-      }
+          item.style.opacity = `${opacity}`;
+          item.style.transform = `scale(${scale})`;
+          item.style.filter = `brightness(${brightness}) drop-shadow(0 0 ${glow}px currentColor)`;
+          item.style.zIndex = smoothFactor > 0.4 ? "10" : "1";
+        });
+      };
 
-      ticking = false;
-    };
+      // Set initial illumination for progress 0
+      updateIllumination(0);
 
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateActiveWords);
-        ticking = true;
-      }
-    };
+      const st = ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: "+=2400", // Luxurious 2400px scroll runway for smooth paced scrolling
+        pin: true,
+        scrub: 1.1, // Smooth cinematic momentum dampening
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          lineHeight = getLineHeight();
+          totalTravel = (items.length - 1) * lineHeight;
+          gsap.set(list, { y: -self.progress * totalTravel });
+          updateIllumination(self.progress);
+        },
+      });
 
-    // Initial update
-    updateActiveWords();
+      const handleResize = () => {
+        lineHeight = getLineHeight();
+        totalTravel = (items.length - 1) * lineHeight;
+        ScrollTrigger.refresh();
+      };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        st.kill();
+        window.removeEventListener("resize", handleResize);
+      };
+    }, sectionRef);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      ctx.revert();
     };
   }, []);
 
   return (
     <div
-      ref={containerRef}
-      className="you-can-scroll-section relative w-full bg-black text-white"
+      ref={sectionRef}
+      className="you-can-scroll-section relative w-full h-screen bg-black text-white flex items-center justify-center overflow-hidden"
       style={{
         backgroundImage: `
           linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -96,17 +102,17 @@ export default function ScrollAnimation() {
         backgroundSize: "60px 60px",
       }}
     >
-      <main className="relative w-full">
-        <section className="relative flex justify-center items-start w-full px-4 sm:px-8 md:px-12">
-          {/* Left sticky 'I can' (small-medium size) */}
-          <div className="sticky top-1/2 -translate-y-1/2 flex items-center pr-2 sm:pr-3 md:pr-4 z-20">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] select-none">
-              I can&nbsp;
-            </h2>
-          </div>
+      <div className="relative flex justify-center items-center w-full px-4 sm:px-8 md:px-12">
+        {/* Left 'I can' */}
+        <div className="flex items-center pr-2 sm:pr-4 md:pr-6 z-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white whitespace-nowrap drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] select-none">
+            I can&nbsp;
+          </h2>
+        </div>
 
-          {/* Right scrolling words: ONLY design., prototype., solve., build., develop. */}
-          <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-2rem)] pb-[calc(50vh-2rem)]">
+        {/* Right scrolling words list with smooth vertical motion */}
+        <div className="relative overflow-visible h-[65px] sm:h-[80px] md:h-[95px] lg:h-[110px] flex items-center">
+          <ul ref={listRef} className="list-none p-0 m-0 z-10 will-change-transform">
             {WORDS.map((item, i) => (
               <li
                 key={item.text}
@@ -115,18 +121,16 @@ export default function ScrollAnimation() {
                 }}
                 style={{
                   color: item.color,
-                  transition:
-                    "opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                  willChange: "transform, opacity, filter",
+                  transformOrigin: "left center",
                 }}
-                className="h-[60px] sm:h-[75px] md:h-[90px] lg:h-[105px] flex items-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight whitespace-nowrap select-none"
+                className="h-[65px] sm:h-[80px] md:h-[95px] lg:h-[110px] flex items-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight whitespace-nowrap select-none"
               >
                 {item.text}
               </li>
             ))}
           </ul>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
