@@ -8,23 +8,6 @@ const WORDS = [
   { text: "solve.", color: "#ffaa00" },
   { text: "build.", color: "#facc15" },
   { text: "develop.", color: "#00f0b5" },
-  { text: "debug.", color: "#00e5ff" },
-  { text: "learn.", color: "#38bdf8" },
-  { text: "cook.", color: "#60a5fa" },
-  { text: "ship.", color: "#818cf8" },
-  { text: "prompt.", color: "#c084fc" },
-  { text: "collaborate.", color: "#e879f9" },
-  { text: "create.", color: "#00ff88" },
-  { text: "inspire.", color: "#06b6d4" },
-  { text: "follow.", color: "#0284c7" },
-  { text: "innovate.", color: "#10b981" },
-  { text: "test.", color: "#a3e635" },
-  { text: "optimize.", color: "#fbbf24" },
-  { text: "teach.", color: "#fb923c" },
-  { text: "visualize.", color: "#f87171" },
-  { text: "transform.", color: "#f472b6" },
-  { text: "scale.", color: "#a78bfa" },
-  { text: "do it.", color: "#00f5d4" },
 ];
 
 export default function ScrollAnimation() {
@@ -122,7 +105,7 @@ export default function ScrollAnimation() {
             </h2>
           </div>
 
-          {/* Right scrolling words: small-medium size with tight vertical stack */}
+          {/* Right scrolling words: ONLY design., prototype., solve., build., develop. */}
           <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-2rem)] pb-[calc(50vh-2rem)]">
             {WORDS.map((item, i) => (
               <li
