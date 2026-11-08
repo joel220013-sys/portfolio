@@ -8,6 +8,8 @@ const WORDS = [
   { text: "solve.", color: "#ffaa00" },
   { text: "build.", color: "#facc15" },
   { text: "develop.", color: "#00f0b5" },
+  { text: "attack.", color: "#ff1744" },
+  { text: "defend.", color: "#00d4ff" },
 ];
 
 export default function ScrollAnimation() {
@@ -105,7 +107,7 @@ export default function ScrollAnimation() {
             </h2>
           </div>
 
-          {/* Right scrolling words: ONLY design., prototype., solve., build., develop. */}
+          {/* Right scrolling words: design, prototype, solve, build, develop, attack, defend */}
           <ul className="list-none p-0 m-0 z-10 pt-[calc(50vh-2rem)] pb-[calc(50vh-2rem)]">
             {WORDS.map((item, i) => (
               <li
