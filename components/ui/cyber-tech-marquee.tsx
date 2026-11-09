@@ -201,8 +201,10 @@ const CYBER_TECH_ITEMS: TechItem[] = [
   },
 ];
 
-// Repeat 4x so even large screens loop with zero gaps
+// Repeat 6x so that the marquee seamlessly stretches across the widest screens
 const REPEATED_ITEMS = [
+  ...CYBER_TECH_ITEMS,
+  ...CYBER_TECH_ITEMS,
   ...CYBER_TECH_ITEMS,
   ...CYBER_TECH_ITEMS,
   ...CYBER_TECH_ITEMS,
@@ -211,36 +213,38 @@ const REPEATED_ITEMS = [
 
 export function CyberTechMarquee() {
   return (
-    <div
-      className="absolute left-7 sm:left-12 md:left-36 lg:left-60 xl:left-80 right-7 sm:right-12 md:right-36 lg:right-60 xl:right-80 top-32 sm:top-40 md:top-48 -translate-y-1/2 z-0 pointer-events-none overflow-hidden select-none"
-      style={{
-        maskImage:
-          "linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
-        WebkitMaskImage:
-          "linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)",
-      }}
-    >
-      <motion.div
-        className="flex w-max items-center gap-6 sm:gap-8 py-2"
-        animate={{ x: ["0%", "-25%"] }}
-        transition={{
-          ease: "linear",
-          duration: 25,
-          repeat: Infinity,
+    <div className="absolute w-screen left-1/2 -translate-x-1/2 top-32 sm:top-40 md:top-48 -translate-y-1/2 z-0 pointer-events-none select-none overflow-hidden">
+      <div
+        className="ml-7 sm:ml-12 md:ml-36 lg:ml-60 xl:ml-80 mr-7 sm:mr-12 md:mr-36 lg:mr-60 xl:mr-80 overflow-hidden"
+        style={{
+          maskImage:
+            "linear-gradient(to right, transparent 0px, black 60px, black calc(100% - 60px), transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0px, black 60px, black calc(100% - 60px), transparent 100%)",
         }}
       >
-        {REPEATED_ITEMS.map((item, index) => (
-          <div
-            key={`${item.name}-${index}`}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/70 border border-zinc-800/60 backdrop-blur-md shadow-[0_0_15px_rgba(0,0,0,0.8)] whitespace-nowrap"
-          >
-            {item.icon}
-            <span className="text-xs sm:text-sm font-medium tracking-wide text-zinc-300">
-              {item.name}
-            </span>
-          </div>
-        ))}
-      </motion.div>
+        <motion.div
+          className="flex w-max items-center gap-10 sm:gap-14 py-2"
+          animate={{ x: ["0%", "-16.666%"] }}
+          transition={{
+            ease: "linear",
+            duration: 20,
+            repeat: Infinity,
+          }}
+        >
+          {REPEATED_ITEMS.map((item, index) => (
+            <div
+              key={`${item.name}-${index}`}
+              className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zinc-950/40 border border-zinc-800/40 backdrop-blur-sm shadow-[0_0_12px_rgba(0,0,0,0.6)] whitespace-nowrap"
+            >
+              {item.icon}
+              <span className="text-xs sm:text-sm font-semibold tracking-wide text-zinc-200">
+                {item.name}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 }
