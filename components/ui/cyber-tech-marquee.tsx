@@ -198,20 +198,20 @@ export function CyberTechMarquee() {
   return (
     <div className="absolute w-screen left-1/2 -translate-x-1/2 top-32 sm:top-40 md:top-48 -translate-y-1/2 z-0 pointer-events-none select-none overflow-hidden">
       <div
-        className="mx-3 sm:mx-6 md:mx-12 lg:mx-16 xl:mx-20 overflow-hidden"
+        className="ml-7 sm:ml-12 md:ml-36 lg:ml-60 xl:ml-80 mr-7 sm:mr-12 md:mr-36 lg:mr-60 xl:mr-80 overflow-hidden"
         style={{
           maskImage:
-            "linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+            "linear-gradient(to right, transparent 0px, black 60px, black calc(100% - 60px), transparent 100%)",
           WebkitMaskImage:
-            "linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+            "linear-gradient(to right, transparent 0px, black 60px, black calc(100% - 60px), transparent 100%)",
         }}
       >
         <motion.div
-          className="flex w-max items-center gap-10 sm:gap-14 md:gap-16 py-2"
+          className="flex w-max items-center gap-12 sm:gap-16 py-2"
           animate={{ x: ["0%", "-16.666%"] }}
           transition={{
             ease: "linear",
-            duration: 25,
+            duration: 22,
             repeat: Infinity,
           }}
         >
