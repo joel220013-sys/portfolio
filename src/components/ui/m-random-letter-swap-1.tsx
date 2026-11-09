@@ -16,6 +16,13 @@ export default function RandomLetterSwapNav({ className }: { className?: string 
       } else {
         window.location.href = "mailto:joel220013@gmail.com";
       }
+    } else if (link === "Work") {
+      const el = document.getElementById("work");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        document.getElementById("scroll-section")?.scrollIntoView({ behavior: "smooth" });
+      }
     } else {
       document.getElementById("scroll-section")?.scrollIntoView({ behavior: "smooth" });
     }

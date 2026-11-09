@@ -6,6 +6,7 @@ import MatrixRain from "@/components/ui/matrix-rain";
 import IntroVideo from "@/components/ui/intro-video";
 import RandomLetterSwapNav from "@/components/ui/m-random-letter-swap-1";
 import ScrollAnimation from "@/components/ui/you-can-scroll";
+import DemoOne from "@/components/ui/demo";
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
@@ -68,6 +69,11 @@ export default function App() {
           {/* Scrolling Down Animation Section */}
           <div id="scroll-section" className="relative z-20 w-full bg-black [overflow-x:clip]">
             <ScrollAnimation />
+          </div>
+
+          {/* Design is Everything Showcase Section */}
+          <div id="work" className="relative z-20 w-full bg-black [overflow-x:clip]">
+            <DemoOne />
           </div>
         </motion.div>
       )}
